@@ -1,3 +1,234 @@
-body {
-  background-color: f0f0f0;
+/* Novo tema - inspirado na imagem: mais claro, vibrante e responsivo.
+   Apenas CSS — mantém os botões .back-btn já existentes nos HTML. */
+
+:root{
+  --bg-a: #f5f8ff;        /* off-white paper */
+  --bg-b: #eaf6ff;        /* soft blue */
+  --accent-1: #4f46e5;    /* indigo */
+  --accent-2: #06b6d4;    /* teal */
+  --accent-3: #fb7185;    /* rose */
+  --accent-4: #f59e0b;    /* amber */
+  --card-bg: #ffffff;
+  --muted: #6b7280;
+  --radius: 18px;
+  --glass: rgba(255,255,255,0.6);
+  --shadow-lg: 0 20px 50px rgba(16,24,40,0.08);
+  --shadow-sm: 0 8px 28px rgba(16,24,40,0.06);
+  font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
+
+/* Reset / base */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  padding:28px;
+  background:
+    radial-gradient(600px 300px at 10% 20%, rgba(79,70,229,0.06), transparent 12%),
+    radial-gradient(500px 260px at 90% 80%, rgba(251,113,133,0.05), transparent 12%),
+    linear-gradient(180deg, var(--bg-a) 0%, var(--bg-b) 100%);
+  -webkit-font-smoothing:antialiased;
+  color: #0f172a;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Header */
+header{
+  position:relative; /* allow absolute back button inside header on desktop */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:18px 20px;
+  border-radius:14px;
+  background: linear-gradient(90deg, rgba(79,70,229,0.07), rgba(6,182,212,0.04));
+  border: 1px solid rgba(15,23,42,0.04);
+  color: var(--accent-1);
+  font-weight:800;
+  letter-spacing:0.02em;
+  box-shadow: var(--shadow-sm);
+  margin-bottom:18px;
+}
+
+/* Main container */
+main{
+  max-width:1100px;
+  margin:0 auto;
+  min-height: calc(100vh - 160px);
+  display:block;
+}
+
+/* Card style: white, floating, with colored top strip like mobile widgets */
+.card, .bemVindo, main > form, main > div {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding:20px;
+  border: none;
+  box-shadow: var(--shadow-lg);
+  position:relative;
+  overflow:visible;
+}
+
+/* accent ribbon on top-right of cards */
+.card::before, .bemVindo::before, main > form::before, main > div::before{
+  content: "";
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 30%;
+  background: conic-gradient(from 120deg, var(--accent-2), var(--accent-1), var(--accent-3), var(--accent-4));
+  filter: blur(26px);
+  opacity: 0.12;
+  pointer-events:none;
+}
+
+/* Headings & text */
+h1,h2,h3,h4{ margin:0 0 8px 0; color:#0b1220 }
+p{ color:var(--muted); margin:0 }
+
+/* Forms (inputs) */
+.form-control, .form-select {
+  background: linear-gradient(180deg, rgba(15,23,42,0.02), rgba(15,23,42,0.01));
+  border: 1px solid rgba(15,23,42,0.06);
+  color: #0f172a;
+  padding: .7rem .85rem;
+  border-radius: 12px;
+  transition: box-shadow .16s, border-color .16s;
+  backdrop-filter: blur(4px);
+}
+.form-control::placeholder, .form-select::placeholder { color: #94a3b8; }
+.form-control:focus, .form-select:focus {
+  outline:none;
+  border-color: rgba(79,70,229,0.9);
+  box-shadow: 0 8px 30px rgba(79,70,229,0.08);
+  background: #fff;
+}
+
+/* Buttons */
+.btn, .btn-primary, .btn-success {
+  border-radius: 12px;
+  padding: .68rem .95rem;
+  font-weight:700;
+  border:none;
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.btn-primary {
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(79,70,229,0.14);
+}
+.btn-success {
+  background: linear-gradient(90deg, #10b981, #34d399);
+  color: #04201f;
+  box-shadow: 0 10px 24px rgba(16,185,129,0.12);
+}
+.btn:hover{ transform: translateY(-3px); }
+
+/* Link-as-button fix */
+button > a { color:inherit; text-decoration:none; display:block; width:100%; height:100%; }
+
+/* Back button
+   Desktop: inside header, aligned left (absolute).
+   Mobile: bottom FAB full-width centered. */
+.back-btn{
+  position: absolute;
+  left:18px;
+  top:50%;
+  transform: translateY(-50%);
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px;
+  background: linear-gradient(90deg, var(--accent-3), var(--accent-2));
+  color:#fff;
+  border-radius:10px;
+  box-shadow: 0 12px 30px rgba(15,23,42,0.12);
+  font-weight:700;
+  text-decoration:none;
+  z-index:9999;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.back-btn::before{
+  content:"";
+  display:inline-block;
+  width:28px;
+  height:28px;
+  line-height:28px;
+  text-align:center;
+  border-radius:7px;
+  background: rgba(255,255,255,0.18);
+  color:#0b1220;
+  font-weight:800;
+  margin-right:4px;
+  mask: none;
+  /* draw arrow with CSS character */
+}
+.back-btn[aria-label]::before{ content: "←"; }
+
+/* When header is not present or back-btn placed elsewhere, keep it fixed */
+@media (min-width: 992px){
+  /* for very wide screens keep back-button inside header as above */
+  .back-btn{ position:absolute; top:50%; left:18px; transform:translateY(-50%); }
+}
+
+/* Tables (history) */
+table{
+  width:100%;
+  border-collapse: collapse;
+  background: transparent;
+}
+th, td{
+  padding:12px 14px;
+  border-bottom:1px solid rgba(15,23,42,0.04);
+  color:#0b1220;
+  text-align:left;
+  background: rgba(255,255,255,0.0);
+}
+thead th{ color:var(--muted); font-weight:700; font-size:0.95rem; }
+
+/* Layout helpers */
+.btns{ display:flex; gap:12px; margin-top:18px }
+.vh-100{ min-height:100vh }
+.text-center{ text-align:center }
+
+/* Responsive: mobile changes */
+@media (max-width: 576px){
+  body{ padding:14px; }
+  header{ padding:12px 16px; text-align:center; }
+  main{ padding-bottom:110px; }
+
+  /* move back button to bottom center as wide FAB */
+  .back-btn{
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 18px;
+    top: auto;
+    width: calc(100% - 40px);
+    justify-content:center;
+    padding:12px 18px;
+    border-radius:999px;
+    gap:10px;
+    font-weight:800;
+    box-shadow: 0 18px 50px rgba(15,23,42,0.12);
+  }
+  .back-btn::before{ display:none; }
+
+  .btns{ flex-direction:column; }
+  th, td{ padding:10px 8px; font-size:0.95rem; }
+  .card, .bemVindo{ padding:14px; border-radius:14px; }
+}
+
+/* Small special: login/cadastro card contrast */
+.bg-light.d-flex.align-items-center.justify-content-center.vh-100 > .card {
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+  border-radius:18px;
+  border: 1px solid rgba(15,23,42,0.04);
+  box-shadow: var(--shadow-lg);
+}
+
+/* final tweaks */
+a { color: var(--accent-1); text-decoration: none; }
+a:hover { text-decoration: underline; }
