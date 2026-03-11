@@ -16,13 +16,20 @@ export function addIncome(income) {
     id: Date.now(),
     description: income.description,
     value: Number(income.value),
-    date: income.date || new Date().toISOString()
+    date: income.date,
+    observacao: income.observacao || ''
   }
 
   incomes.push(newIncome)
   localStorage.setItem(INCOMES_KEY, JSON.stringify(incomes))
 
   return newIncome
+}
+
+export function deleteIncome(id) {
+  let incomes = getIncomes()
+  incomes = incomes.filter(income => income.id !== id)
+  localStorage.setItem(INCOMES_KEY, JSON.stringify(incomes))
 }
 
 export function getTotalIncomes() {
@@ -41,11 +48,12 @@ export function addExpense(expense) {
   const expenses = getExpenses()
 
   const newExpense = {
-    id: Date.now(),
+    id: expense.id || Date.now(),
     description: expense.description,
     value: Number(expense.value),
-    date: expense.date || new Date().toISOString(),
-    tipo: expense.tipo || 'geral'
+    date: expense.date,
+    tipo: expense.tipo,
+    observacao: expense.observacao || ''
   }
 
   expenses.push(newExpense)
@@ -54,8 +62,22 @@ export function addExpense(expense) {
   return newExpense
 }
 
+export function deleteExpense(id) {
+  let expenses = getExpenses()
+  expenses = expenses.filter(expense => expense.id !== id)
+  localStorage.setItem(EXPENSES_KEY, JSON.stringify(expenses))
+}
+
+export function getExpensesByType(tipo) {
+  return getExpenses().filter(expense => expense.tipo === tipo)
+}
+
 export function getTotalExpenses() {
   return getExpenses().reduce((total, item) => total + item.value, 0)
+}
+
+export function getTotalExpensesByType(tipo) {
+  return getExpensesByType(tipo).reduce((total, item) => total + item.value, 0)
 }
 
 /* ======================

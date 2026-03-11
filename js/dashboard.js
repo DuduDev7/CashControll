@@ -1,21 +1,37 @@
-//nome(começo do dashboard)
-function nomeBemVindo() {
-  let usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
-
-  document.getElementById('nomeBemVindo').innerHTML = 'Olá, ' + usuario.nome;
-}
-
 import {
   getTotalIncomes,
   getTotalExpenses,
   getBalance
 } from './api.js'
 
-document.getElementById('total-incomes').innerText =
-  getTotalIncomes().toFixed(2)
+function nomeBemVindo() {
+  let usuario = JSON.parse(localStorage.getItem('usuarioLogado'))
+  
+  if (usuario && usuario.nome) {
+    document.getElementById('nomeBemVindo').innerHTML = 'Olá, ' + usuario.nome
+  } else {
+    document.getElementById('nomeBemVindo').innerHTML = 'Olá, Usuário'
+  }
+}
 
-document.getElementById('total-expenses').innerText =
-  getTotalExpenses().toFixed(2)
+function atualizarDados() {
+  const totalIncomes = getTotalIncomes()
+  const totalExpenses = getTotalExpenses()
+  const balance = getBalance()
 
-document.getElementById('balance').innerText =
-  getBalance().toFixed(2)
+  const valorEntrou = document.getElementById('valorEntrou')
+  const valorSaiu = document.getElementById('valorSaiu')
+  const saldo = document.getElementById('saldo')
+
+  if (valorEntrou) valorEntrou.innerText = 'R$ ' + totalIncomes.toFixed(2).replace('.', ',')
+  if (valorSaiu) valorSaiu.innerText = 'R$ ' + totalExpenses.toFixed(2).replace('.', ',')
+  if (saldo) {
+    saldo.innerText = 'R$ ' + balance.toFixed(2).replace('.', ',')
+    saldo.style.color = balance >= 0 ? '#10b981' : '#ef4444'
+  }
+}
+
+window.addEventListener('load', () => {
+  nomeBemVindo()
+  atualizarDados()
+})
