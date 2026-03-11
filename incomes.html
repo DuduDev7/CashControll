@@ -17,53 +17,52 @@
     <main>
       <form id="incomeForm">
         <div class="mb-3">
-          <label for="exampleFormControlInput1" class="form-label">Valor</label>
+          <label class="form-label">Valor</label>
           <input
             type="number"
             step="0.01"
             class="form-control"
             id="valor"
-            placeholder="Digite o valor que entrou"
+            placeholder="Digite o valor da receita"
+            required
           />
         </div>
         <div class="mb-3">
-          <label for="exampleFormControlInput1" class="form-label">Fonte</label>
+          <label class="form-label">Fonte</label>
           <input
             type="text"
             class="form-control"
             id="fonte"
-            placeholder="Da onde veio o dinheiro"
+            placeholder="Ex: Salário, Freelancer, Presente..."
+            required
           />
         </div>
         <div class="mb-3">
-          <label for="exampleFormControlInput1" class="form-label">Data</label>
+          <label class="form-label">Data</label>
           <input
             type="date"
             class="form-control"
             id="data"
-            placeholder="Quando entrou o dinheiro"
+            required
           />
         </div>
         <div class="mb-3">
-          <label for="exampleFormControlTextarea1" class="form-label"
-            >Observação</label
-          >
+          <label class="form-label">Observação</label>
           <textarea
             class="form-control"
             id="observacao"
             rows="3"
-            placeholder="Tem alguma observação?"
+            placeholder="Alguma anotação importante?"
           ></textarea>
         </div>
 
-        <button type="submit" class="btn btn-success">Salvar</button>
+        <button type="submit" class="btn btn-success">Salvar Receita</button>
       </form>
 
-      <button><a href="histoIncomes.html">Historico</a></button>
+      <button class="btn btn-primary"><a href="histoIncomes.html">Histórico</a></button>
     </main>
 
-    <a class="back-btn" href="dashboard.html" aria-label="Voltar para dashboard">Voltar</a>
-
+    <a class="back-btn" href="dashboard.html" aria-label="Voltar para dashboard">← Voltar</a>
 
     <footer></footer>
 
