@@ -1,6 +1,5 @@
 //cadastro
-
-function cadastrar() {
+async function cadastrar() {
   let nome = document.getElementById('nome').value
   let email = document.getElementById('email').value
   let senha = document.getElementById('senha').value
@@ -16,67 +15,88 @@ function cadastrar() {
     return
   }
 
-  let usuarios = JSON.parse(localStorage.getItem('usuarios'))
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_name: nome,
+        user_email: email,
+        user_password: senha
+      })
+    })
 
-  if (!usuarios) {
-    usuarios = []
+    const result = await response.json()
+
+    if (!response.ok) {
+      document.getElementById('resultado').innerHTML = result.error || 'Erro ao cadastrar'
+      return
+    }
+
+    // Salva o token
+    localStorage.setItem('token', result.token)
+    localStorage.setItem('user', JSON.stringify(result.user))
+
+    document.getElementById('resultado').innerHTML = '✅ Cadastro realizado com sucesso! Redirecionando...'
+    
+    setTimeout(() => {
+      window.location.href = 'dashboard.html'
+    }, 1500)
+  } catch (error) {
+    console.error('Erro:', error)
+    document.getElementById('resultado').innerHTML = 'Erro ao conectar com o servidor'
   }
-
-  let existe = usuarios.find(u => u.email === email)
-
-  if (existe) {
-    document.getElementById('resultado').innerHTML = 'Email já cadastrado'
-    return
-  }
-
-  let novoUsuario = {
-    nome: nome,
-    email: email,
-    senha: senha
-  }
-
-  usuarios.push(novoUsuario)
-  localStorage.setItem('usuarios', JSON.stringify(usuarios))
-
-  document.getElementById('resultado').innerHTML =
-    'Cadastro realizado com sucesso'
 }
 
 //login
-
-function login() {
+async function login() {
   let email = document.getElementById('email').value
   let senha = document.getElementById('senha').value
 
-  let usuarios = JSON.parse(localStorage.getItem('usuarios'))
-
-  if (!usuarios) {
-    document.getElementById('resultado').innerHTML = 'Nenhum usuário cadastrado'
+  if (email === '' || senha === '') {
+    document.getElementById('resultado').innerHTML = 'Email e senha são obrigatórios'
     return
   }
 
-  let usuario = usuarios.find(u => u.email === email)
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_email: email,
+        user_password: senha
+      })
+    })
 
-  if (!usuario) {
-    document.getElementById('resultado').innerHTML = 'Usuário não encontrado'
-    return
+    const result = await response.json()
+
+    if (!response.ok) {
+      document.getElementById('resultado').innerHTML = result.error || 'Erro ao fazer login'
+      return
+    }
+
+    // Salva o token e dados do usuário
+    localStorage.setItem('token', result.token)
+    localStorage.setItem('user', JSON.stringify(result.user))
+
+    document.getElementById('resultado').innerHTML = '✅ Login realizado com sucesso! Redirecionando...'
+    
+    setTimeout(() => {
+      window.location.href = 'dashboard.html'
+    }, 1000)
+  } catch (error) {
+    console.error('Erro:', error)
+    document.getElementById('resultado').innerHTML = 'Erro ao conectar com o servidor'
   }
-
-  if (usuario.senha !== senha) {
-    document.getElementById('resultado').innerHTML = 'Senha incorreta'
-    return
-  }
-
-  localStorage.setItem('logado', 'true')
-  localStorage.setItem('usuarioLogado', JSON.stringify(usuario))
-
-  window.location.href = 'dashboard.html'
 }
 
-//logout
-
+// logout
 function logout() {
-  localStorage.removeItem('logado')
-  localStorage.removeItem('usuarioLogado')
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
   window.location.href = 'index.html'
 }

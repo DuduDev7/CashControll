@@ -1,89 +1,202 @@
-const INCOMES_KEY = 'incomes'
-const EXPENSES_KEY = 'expenses'
+// URL base da API
+const API_URL = 'http://localhost:5000/api'
+
+// Função auxiliar para fazer requisições
+async function makeRequest(endpoint, method = 'GET', data = null) {
+  const token = localStorage.getItem('token')
+  
+  const headers = {
+    'Content-Type': 'application/json'
+  }
+  
+  // Adiciona token se existir
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+  
+  const options = {
+    method,
+    headers
+  }
+  
+  if (data) {
+    options.body = JSON.stringify(data)
+  }
+  
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, options)
+    const result = await response.json()
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Erro na requisição')
+    }
+    
+    return result
+  } catch (error) {
+    console.error('Erro:', error)
+    throw error
+  }
+}
 
 /* ======================
    INCOMES (Receitas)
 ====================== */
 
-export function getIncomes() {
-  return JSON.parse(localStorage.getItem(INCOMES_KEY)) || []
-}
-
-export function addIncome(income) {
-  const incomes = getIncomes()
-
-  const newIncome = {
-    id: Date.now(),
-    description: income.description,
-    value: Number(income.value),
-    date: income.date,
-    observacao: income.observacao || ''
+export async function getIncomes() {
+  try {
+    const result = await makeRequest('/incomes')
+    return result.receitas || []
+  } catch (error) {
+    console.error('Erro ao buscar receitas:', error)
+    return []
   }
-
-  incomes.push(newIncome)
-  localStorage.setItem(INCOMES_KEY, JSON.stringify(incomes))
-
-  return newIncome
 }
 
-export function deleteIncome(id) {
-  let incomes = getIncomes()
-  incomes = incomes.filter(income => income.id !== id)
-  localStorage.setItem(INCOMES_KEY, JSON.stringify(incomes))
+export async function addIncome(income) {
+  try {
+    const result = await makeRequest('/incomes', 'POST', {
+      descricao: income.description,
+      valor: income.value,
+      data: income.date,
+      observacao: income.observacao || ''
+    })
+    return result.receita
+  } catch (error) {
+    console.error('Erro ao adicionar receita:', error)
+    throw error
+  }
 }
 
-export function getTotalIncomes() {
-  return getIncomes().reduce((total, item) => total + item.value, 0)
+export async function updateIncome(incomeId, income) {
+  try {
+    const result = await makeRequest(`/incomes/${incomeId}`, 'PUT', {
+      descricao: income.description,
+      valor: income.value,
+      data: income.date,
+      observacao: income.observacao || ''
+    })
+    return result
+  } catch (error) {
+    console.error('Erro ao atualizar receita:', error)
+    throw error
+  }
+}
+
+export async function deleteIncome(incomeId) {
+  try {
+    await makeRequest(`/incomes/${incomeId}`, 'DELETE')
+  } catch (error) {
+    console.error('Erro ao deletar receita:', error)
+    throw error
+  }
+}
+
+export async function getTotalIncomes() {
+  try {
+    const receitas = await getIncomes()
+    return receitas.reduce((total, item) => total + item.valor, 0)
+  } catch (error) {
+    console.error('Erro ao calcular total de receitas:', error)
+    return 0
+  }
 }
 
 /* ======================
    EXPENSES (Despesas)
 ====================== */
 
-export function getExpenses() {
-  return JSON.parse(localStorage.getItem(EXPENSES_KEY)) || []
-}
-
-export function addExpense(expense) {
-  const expenses = getExpenses()
-
-  const newExpense = {
-    id: expense.id || Date.now(),
-    description: expense.description,
-    value: Number(expense.value),
-    date: expense.date,
-    tipo: expense.tipo,
-    observacao: expense.observacao || ''
+export async function getExpenses() {
+  try {
+    const result = await makeRequest('/expenses')
+    return result.despesas || []
+  } catch (error) {
+    console.error('Erro ao buscar despesas:', error)
+    return []
   }
-
-  expenses.push(newExpense)
-  localStorage.setItem(EXPENSES_KEY, JSON.stringify(expenses))
-
-  return newExpense
 }
 
-export function deleteExpense(id) {
-  let expenses = getExpenses()
-  expenses = expenses.filter(expense => expense.id !== id)
-  localStorage.setItem(EXPENSES_KEY, JSON.stringify(expenses))
+export async function addExpense(expense) {
+  try {
+    const result = await makeRequest('/expenses', 'POST', {
+      descricao: expense.description,
+      valor: expense.value,
+      categoria: expense.tipo,
+      data: expense.date,
+      observacao: expense.observacao || ''
+    })
+    return result.despesa
+  } catch (error) {
+    console.error('Erro ao adicionar despesa:', error)
+    throw error
+  }
 }
 
-export function getExpensesByType(tipo) {
-  return getExpenses().filter(expense => expense.tipo === tipo)
+export async function updateExpense(expenseId, expense) {
+  try {
+    const result = await makeRequest(`/expenses/${expenseId}`, 'PUT', {
+      descricao: expense.description,
+      valor: expense.value,
+      categoria: expense.tipo,
+      data: expense.date,
+      observacao: expense.observacao || ''
+    })
+    return result
+  } catch (error) {
+    console.error('Erro ao atualizar despesa:', error)
+    throw error
+  }
 }
 
-export function getTotalExpenses() {
-  return getExpenses().reduce((total, item) => total + item.value, 0)
+export async function deleteExpense(expenseId) {
+  try {
+    await makeRequest(`/expenses/${expenseId}`, 'DELETE')
+  } catch (error) {
+    console.error('Erro ao deletar despesa:', error)
+    throw error
+  }
 }
 
-export function getTotalExpensesByType(tipo) {
-  return getExpensesByType(tipo).reduce((total, item) => total + item.value, 0)
+export async function getExpensesByType(tipo) {
+  try {
+    const despesas = await getExpenses()
+    return despesas.filter(expense => expense.categoria === tipo)
+  } catch (error) {
+    console.error('Erro ao filtrar despesas por tipo:', error)
+    return []
+  }
+}
+
+export async function getTotalExpenses() {
+  try {
+    const despesas = await getExpenses()
+    return despesas.reduce((total, item) => total + item.valor, 0)
+  } catch (error) {
+    console.error('Erro ao calcular total de despesas:', error)
+    return 0
+  }
+}
+
+export async function getTotalExpensesByType(tipo) {
+  try {
+    const despesas = await getExpensesByType(tipo)
+    return despesas.reduce((total, item) => total + item.valor, 0)
+  } catch (error) {
+    console.error('Erro ao calcular despesas por tipo:', error)
+    return 0
+  }
 }
 
 /* ======================
    BALANCE (Saldo)
 ====================== */
 
-export function getBalance() {
-  return getTotalIncomes() - getTotalExpenses()
+export async function getBalance() {
+  try {
+    const totalIncomes = await getTotalIncomes()
+    const totalExpenses = await getTotalExpenses()
+    return totalIncomes - totalExpenses
+  } catch (error) {
+    console.error('Erro ao calcular saldo:', error)
+    return 0
+  }
 }

@@ -6,7 +6,7 @@ if (form) {
   form.addEventListener('submit', handleSubmit)
 }
 
-function handleSubmit(e) {
+async function handleSubmit(e) {
   e.preventDefault()
 
   const valor = document.getElementById('valor')?.value.trim() || ''
@@ -23,12 +23,16 @@ function handleSubmit(e) {
 
   if (!validate(income)) return
 
-  addIncome(income)
-  showSuccessMessage('✅ Receita adicionada com sucesso!', () => {
-    setTimeout(() => {
-      window.location.href = 'histoIncomes.html'
-    }, 500)
-  })
+  try {
+    await addIncome(income)
+    showSuccessMessage('✅ Receita adicionada com sucesso!', () => {
+      setTimeout(() => {
+        window.location.href = 'histoIncomes.html'
+      }, 500)
+    })
+  } catch (error) {
+    showErrorMessage('❌ Erro ao adicionar receita: ' + error.message)
+  }
 
   form.reset()
 }

@@ -1,6 +1,6 @@
-import { addExpense } from './api.js'
+import { addExpense, deleteExpense, getExpenses } from './api.js'
 
-function adicionarDespesa() {
+async function adicionarDespesa() {
   const valor = document.getElementById('valor')?.value.trim() || ''
   const fonte = document.getElementById('fonte')?.value.trim() || ''
   const data = document.getElementById('data')?.value.trim() || ''
@@ -23,20 +23,23 @@ function adicionarDespesa() {
     value: Number(valor),
     date: data,
     tipo: tipo,
-    observacao: observacao,
-    id: Date.now()
+    observacao: observacao
   }
 
-  addExpense(expense)
-  renderExpenseInTable(expense)
+  try {
+    await addExpense(expense)
+    renderExpenseInTable(expense)
 
-  showSuccessMessage(`✅ Despesa adicionada em "${getTipoLabel(tipo)}"!`)
+    showSuccessMessage(`✅ Despesa adicionada em "${getTipoLabel(tipo)}"!`)
 
-  document.getElementById('valor').value = ''
-  document.getElementById('fonte').value = ''
-  document.getElementById('data').value = ''
-  document.getElementById('tipo').value = 'Selecione o tipo'
-  document.getElementById('observacao').value = ''
+    document.getElementById('valor').value = ''
+    document.getElementById('fonte').value = ''
+    document.getElementById('data').value = ''
+    document.getElementById('tipo').value = 'Selecione o tipo'
+    document.getElementById('observacao').value = ''
+  } catch (error) {
+    showErrorMessage('❌ Erro ao adicionar despesa: ' + error.message)
+  }
 
   return false
 }
@@ -80,19 +83,21 @@ function renderExpenseInTable(expense) {
     <td>${expense.description}</td>
     <td>${dataFormatada}</td>
     <td>${expense.observacao || '-'}</td>
-    <td><button class="btn btn-danger btn-sm" onclick="deleteExpenseRow(this, ${expense.id})">X</button></td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteExpenseRow(this, ${expense.expense_id})">X</button></td>
   `
 
   tabela.appendChild(tr)
 }
 
-function deleteExpenseRow(btn, id) {
+async function deleteExpenseRow(btn, id) {
   if (confirm('Tem certeza que deseja excluir esta despesa?')) {
-    btn.closest('tr').remove()
-    let expenses = JSON.parse(localStorage.getItem('expenses')) || []
-    expenses = expenses.filter(e => e.id !== id)
-    localStorage.setItem('expenses', JSON.stringify(expenses))
-    showSuccessMessage('✅ Despesa excluída com sucesso!')
+    try {
+      await deleteExpense(id)
+      btn.closest('tr').remove()
+      showSuccessMessage('✅ Despesa excluída com sucesso!')
+    } catch (error) {
+      showErrorMessage('❌ Erro ao excluir despesa: ' + error.message)
+    }
   }
 }
 
@@ -135,12 +140,16 @@ function showErrorMessage(message) {
   }, 4000)
 }
 
-function carregarDespesasSalvas() {
-  let expenses = JSON.parse(localStorage.getItem('expenses')) || []
-  
-  expenses.forEach(expense => {
-    renderExpenseInTable(expense)
-  })
+async function carregarDespesasSalvas() {
+  try {
+    const expenses = await getExpenses()
+    
+    expenses.forEach(expense => {
+      renderExpenseInTable(expense)
+    })
+  } catch (error) {
+    console.error('Erro ao carregar despesas:', error)
+  }
 }
 
 window.adicionarDespesa = adicionarDespesa
