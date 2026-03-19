@@ -1,3 +1,10 @@
+const token = localStorage.getItem('token')
+
+if (!token) {
+  alert('Você precisa estar logado')
+  window.location.href = 'index.html'
+}
+
 import { addIncome } from './api.js'
 
 const form = document.querySelector('#incomeForm')

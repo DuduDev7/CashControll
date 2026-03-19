@@ -1,46 +1,52 @@
-import sqlite3
-from datetime import datetime
+import psycopg2
 import os
 
-DB_PATH = 'database.db'
+def get_db():
+    """Retorna conexão com PostgreSQL"""
+    conn = psycopg2.connect(
+        os.environ.get("DATABASE_URL"),
+        sslmode='require'
+    )
+    return conn
+
 
 def init_db():
-    """Inicializa o banco de dados com as tabelas necessárias"""
-    conn = sqlite3.connect(DB_PATH)
+    """Inicializa o banco no PostgreSQL"""
+    conn = get_db()
     cursor = conn.cursor()
-    
+
     # Tabela de usuários
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
-            user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id SERIAL PRIMARY KEY,
             user_name TEXT NOT NULL,
             user_email TEXT UNIQUE NOT NULL,
             user_password TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    
-    # Tabela de receitas (incomes)
+
+    # Tabela de receitas
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS receitas (
-            income_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            income_id SERIAL PRIMARY KEY,
             user_id INTEGER NOT NULL,
             descricao TEXT NOT NULL,
-            valor REAL NOT NULL,
+            valor DECIMAL NOT NULL,
             data DATE NOT NULL,
             observacao TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES usuarios (user_id) ON DELETE CASCADE
         )
     ''')
-    
-    # Tabela de despesas (expenses)
+
+    # Tabela de despesas
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS despesas (
-            expense_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            expense_id SERIAL PRIMARY KEY,
             user_id INTEGER NOT NULL,
             descricao TEXT NOT NULL,
-            valor REAL NOT NULL,
+            valor DECIMAL NOT NULL,
             categoria TEXT NOT NULL,
             data DATE NOT NULL,
             observacao TEXT,
@@ -48,16 +54,9 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES usuarios (user_id) ON DELETE CASCADE
         )
     ''')
-    
+
     conn.commit()
+    cursor.close()
     conn.close()
-    print("✓ Database inicializado com sucesso!")
-
-def get_db():
-    """Retorna uma conexão com o banco de dados"""
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-if __name__ == '__main__':
-    init_db()
+    
+    print("✓ PostgreSQL conectado e tabelas criadas!")

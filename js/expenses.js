@@ -1,3 +1,10 @@
+const token = localStorage.getItem('token')
+
+if (!token) {
+  alert('Você precisa estar logado')
+  window.location.href = 'index.html'
+}
+
 import { addExpense, deleteExpense, getExpenses } from './api.js'
 
 async function adicionarDespesa() {
@@ -9,7 +16,9 @@ async function adicionarDespesa() {
 
   // Validação de campos vazios
   if (!valor || !fonte || !data || tipo === 'Selecione o tipo') {
-    showErrorMessage('⚠️ Existem campos vazios! Preencha todos os campos obrigatórios.')
+    showErrorMessage(
+      '⚠️ Existem campos vazios! Preencha todos os campos obrigatórios.'
+    )
     return false
   }
 
@@ -27,8 +36,8 @@ async function adicionarDespesa() {
   }
 
   try {
-    await addExpense(expense)
-    renderExpenseInTable(expense)
+    const novaDespesa = await addExpense(expense)
+    renderExpenseInTable(novaDespesa)
 
     showSuccessMessage(`✅ Despesa adicionada em "${getTipoLabel(tipo)}"!`)
 
@@ -46,10 +55,10 @@ async function adicionarDespesa() {
 
 function getTipoLabel(tipo) {
   const labels = {
-    'essencial': '📌 Essencial',
-    'variavel': '📊 Variável',
-    'financeiro': '💰 Financeiro',
-    'outros': '🔧 Outros'
+    essencial: '📌 Essencial',
+    variavel: '📊 Variável',
+    financeiro: '💰 Financeiro',
+    outros: '🔧 Outros'
   }
   return labels[tipo] || tipo
 }
@@ -83,7 +92,9 @@ function renderExpenseInTable(expense) {
     <td>${expense.description}</td>
     <td>${dataFormatada}</td>
     <td>${expense.observacao || '-'}</td>
-    <td><button class="btn btn-danger btn-sm" onclick="deleteExpenseRow(this, ${expense.expense_id})">X</button></td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteExpenseRow(this, ${
+      expense.expense_id
+    })">X</button></td>
   `
 
   tabela.appendChild(tr)
@@ -110,11 +121,11 @@ function showSuccessMessage(message, callback) {
     </div>
   `
   document.body.appendChild(alertDiv)
-  
+
   setTimeout(() => {
     alertDiv.classList.add('show')
   }, 100)
-  
+
   setTimeout(() => {
     alertDiv.remove()
     if (callback) callback()
@@ -130,11 +141,11 @@ function showErrorMessage(message) {
     </div>
   `
   document.body.appendChild(alertDiv)
-  
+
   setTimeout(() => {
     alertDiv.classList.add('show')
   }, 100)
-  
+
   setTimeout(() => {
     alertDiv.remove()
   }, 4000)
@@ -143,7 +154,7 @@ function showErrorMessage(message) {
 async function carregarDespesasSalvas() {
   try {
     const expenses = await getExpenses()
-    
+
     expenses.forEach(expense => {
       renderExpenseInTable(expense)
     })

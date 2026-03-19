@@ -4,33 +4,37 @@ const API_URL = '/api'
 // Função auxiliar para fazer requisições
 async function makeRequest(endpoint, method = 'GET', data = null) {
   const token = localStorage.getItem('token')
-  
+
+  if (!token) {
+    throw new Error('Token ausente')
+  }
+
   const headers = {
     'Content-Type': 'application/json'
   }
-  
+
   // Adiciona token se existir
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
   }
-  
+
   const options = {
     method,
     headers
   }
-  
+
   if (data) {
     options.body = JSON.stringify(data)
   }
-  
+
   try {
     const response = await fetch(`${API_URL}${endpoint}`, options)
     const result = await response.json()
-    
+
     if (!response.ok) {
       throw new Error(result.error || 'Erro na requisição')
     }
-    
+
     return result
   } catch (error) {
     console.error('Erro:', error)

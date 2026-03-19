@@ -42,7 +42,7 @@ async function cadastrar() {
     document.getElementById('resultado').innerHTML = '✅ Cadastro realizado com sucesso! Redirecionando...'
     
     setTimeout(() => {
-      window.location.href = 'dashboard.html'
+      window.location.href = 'index.html'
     }, 1500)
   } catch (error) {
     console.error('Erro:', error)
