@@ -1,206 +1,117 @@
-// URL base da API
-const API_URL = '/api'
+const API_URL = 'http://127.0.0.1:5000/api'
 
-// Função auxiliar para fazer requisições
+// ==========================
+// REQUEST BASE (SEM TOKEN)
+// ==========================
 async function makeRequest(endpoint, method = 'GET', data = null) {
-  const token = localStorage.getItem('token')
-
-  if (!token) {
-    throw new Error('Token ausente')
-  }
-
-  const headers = {
-    'Content-Type': 'application/json'
-  }
-
-  // Adiciona token se existir
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
-
   const options = {
     method,
-    headers
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include' // 🔥 ESSENCIAL pro Flask session
   }
 
   if (data) {
     options.body = JSON.stringify(data)
   }
 
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, options)
-    const result = await response.json()
+  const response = await fetch(`${API_URL}${endpoint}`, options)
 
-    if (!response.ok) {
-      throw new Error(result.error || 'Erro na requisição')
-    }
-
-    return result
-  } catch (error) {
-    console.error('Erro:', error)
-    throw error
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.error || 'Erro na requisição')
   }
+
+  return response.json()
 }
 
-/* ======================
-   INCOMES (Receitas)
-====================== */
+
+// ==========================
+// INCOMES
+// ==========================
 
 export async function getIncomes() {
-  try {
-    const result = await makeRequest('/incomes')
-    return result.receitas || []
-  } catch (error) {
-    console.error('Erro ao buscar receitas:', error)
-    return []
-  }
+  return await makeRequest('/incomes')
 }
 
 export async function addIncome(income) {
-  try {
-    const result = await makeRequest('/incomes', 'POST', {
-      descricao: income.description,
-      valor: income.value,
-      data: income.date,
-      observacao: income.observacao || ''
-    })
-    return result.receita
-  } catch (error) {
-    console.error('Erro ao adicionar receita:', error)
-    throw error
-  }
+  return await makeRequest('/incomes', 'POST', {
+    description: income.description,
+    value: income.value,
+    date: income.date
+  })
 }
 
-export async function updateIncome(incomeId, income) {
-  try {
-    const result = await makeRequest(`/incomes/${incomeId}`, 'PUT', {
-      descricao: income.description,
-      valor: income.value,
-      data: income.date,
-      observacao: income.observacao || ''
-    })
-    return result
-  } catch (error) {
-    console.error('Erro ao atualizar receita:', error)
-    throw error
-  }
-}
-
-export async function deleteIncome(incomeId) {
-  try {
-    await makeRequest(`/incomes/${incomeId}`, 'DELETE')
-  } catch (error) {
-    console.error('Erro ao deletar receita:', error)
-    throw error
-  }
+export async function deleteIncome(id) {
+  return await makeRequest(`/incomes/${id}`, 'DELETE')
 }
 
 export async function getTotalIncomes() {
-  try {
-    const receitas = await getIncomes()
-    return receitas.reduce((total, item) => total + item.valor, 0)
-  } catch (error) {
-    console.error('Erro ao calcular total de receitas:', error)
-    return 0
-  }
+  const res = await makeRequest('/incomes/total')
+  return res.total || 0
 }
 
-/* ======================
-   EXPENSES (Despesas)
-====================== */
+
+// ==========================
+// EXPENSES
+// ==========================
 
 export async function getExpenses() {
-  try {
-    const result = await makeRequest('/expenses')
-    return result.despesas || []
-  } catch (error) {
-    console.error('Erro ao buscar despesas:', error)
-    return []
-  }
+  return await makeRequest('/expenses')
 }
 
 export async function addExpense(expense) {
-  try {
-    const result = await makeRequest('/expenses', 'POST', {
-      descricao: expense.description,
-      valor: expense.value,
-      categoria: expense.tipo,
-      data: expense.date,
-      observacao: expense.observacao || ''
-    })
-    return result.despesa
-  } catch (error) {
-    console.error('Erro ao adicionar despesa:', error)
-    throw error
-  }
+  return await makeRequest('/expenses', 'POST', {
+    description: expense.description,
+    value: expense.value,
+    date: expense.date,
+    tipo: expense.tipo
+  })
 }
 
-export async function updateExpense(expenseId, expense) {
-  try {
-    const result = await makeRequest(`/expenses/${expenseId}`, 'PUT', {
-      descricao: expense.description,
-      valor: expense.value,
-      categoria: expense.tipo,
-      data: expense.date,
-      observacao: expense.observacao || ''
-    })
-    return result
-  } catch (error) {
-    console.error('Erro ao atualizar despesa:', error)
-    throw error
-  }
+export async function deleteExpense(id) {
+  return await makeRequest(`/expenses/${id}`, 'DELETE')
 }
 
-export async function deleteExpense(expenseId) {
-  try {
-    await makeRequest(`/expenses/${expenseId}`, 'DELETE')
-  } catch (error) {
-    console.error('Erro ao deletar despesa:', error)
-    throw error
-  }
-}
-
-export async function getExpensesByType(tipo) {
-  try {
-    const despesas = await getExpenses()
-    return despesas.filter(expense => expense.categoria === tipo)
-  } catch (error) {
-    console.error('Erro ao filtrar despesas por tipo:', error)
-    return []
-  }
-}
 
 export async function getTotalExpenses() {
-  try {
-    const despesas = await getExpenses()
-    return despesas.reduce((total, item) => total + item.valor, 0)
-  } catch (error) {
-    console.error('Erro ao calcular total de despesas:', error)
-    return 0
-  }
+  const res = await makeRequest('/expenses/total')
+  return res.total || 0
 }
 
-export async function getTotalExpensesByType(tipo) {
-  try {
-    const despesas = await getExpensesByType(tipo)
-    return despesas.reduce((total, item) => total + item.valor, 0)
-  } catch (error) {
-    console.error('Erro ao calcular despesas por tipo:', error)
-    return 0
-  }
+// ==========================
+// UPDATE CRUD
+// ==========================
+
+export async function updateIncome(id, income) {
+  return await makeRequest(`/incomes/${id}`, 'PUT', income)
 }
 
-/* ======================
-   BALANCE (Saldo)
-====================== */
+export async function updateExpense(id, expense) {
+  return await makeRequest(`/expenses/${id}`, 'PUT', expense)
+}
+
+// ==========================
+// USER PROFILE
+// ==========================
+
+export async function getMe() {
+  return await makeRequest('/auth/me')
+}
+
+export async function updateUser(userData) {
+  return await makeRequest('/auth/me', 'PUT', userData)
+}
+
+
+// ==========================
+// BALANCE
+// ==========================
 
 export async function getBalance() {
-  try {
-    const totalIncomes = await getTotalIncomes()
-    const totalExpenses = await getTotalExpenses()
-    return totalIncomes - totalExpenses
-  } catch (error) {
-    console.error('Erro ao calcular saldo:', error)
-    return 0
-  }
+  const incomes = await getTotalIncomes()
+  const expenses = await getTotalExpenses()
+  return incomes - expenses
 }
+

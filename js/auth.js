@@ -16,15 +16,16 @@ async function cadastrar() {
   }
 
   try {
-    const response = await fetch('/api/auth/register', {
+    const response = await fetch('http://127.0.0.1:5000/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify({
-        user_name: nome,
-        user_email: email,
-        user_password: senha
+        nome: nome,
+        email: email,
+        senha: senha
       })
     })
 
@@ -35,12 +36,13 @@ async function cadastrar() {
       return
     }
 
+    localStorage.setItem('user', JSON.stringify(result))
+
     // Salva o token
-    localStorage.setItem('token', result.token)
-    localStorage.setItem('user', JSON.stringify(result.user))
+    localStorage.setItem('user', JSON.stringify(result))
 
     document.getElementById('resultado').innerHTML = '✅ Cadastro realizado com sucesso! Redirecionando...'
-    
+
     setTimeout(() => {
       window.location.href = 'index.html'
     }, 1500)
@@ -61,30 +63,36 @@ async function login() {
   }
 
   try {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch('http://127.0.0.1:5000/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify({
-        user_email: email,
-        user_password: senha
+        email: email,
+        senha: senha
       })
     })
 
     const result = await response.json()
+
+    console.log('STATUS:', response.status)
+    console.log('RESULT:', result)
 
     if (!response.ok) {
       document.getElementById('resultado').innerHTML = result.error || 'Erro ao fazer login'
       return
     }
 
+    localStorage.setItem('user', JSON.stringify(result))
+
     // Salva o token e dados do usuário
     localStorage.setItem('token', result.token)
-    localStorage.setItem('user', JSON.stringify(result.user))
+    localStorage.setItem('user', JSON.stringify(result))
 
     document.getElementById('resultado').innerHTML = '✅ Login realizado com sucesso! Redirecionando...'
-    
+
     setTimeout(() => {
       window.location.href = 'dashboard.html'
     }, 1000)
