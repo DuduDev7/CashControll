@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil - CashControll</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>CashControll</header>
+
+  <main class="container mt-5">
+    <h2>👤 Meu Perfil</h2>
+    
+    <div id="perfilInfo" class="card mb-4" style="display: none;">
+      <div class="card-body">
+        <h5 id="nomeAtual"></h5>
+        <p id="emailAtual"></p>
+      </div>
+    </div>
+    
+    <form id="editForm">
+      <div class="mb-3">
+        <label class="form-label">Nome</label>
+        <input type="text" class="form-control" id="nome" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" required>
+      </div>
+      <button type="submit" class="btn btn-primary me-2">Salvar Alterações</button>
+      <button type="button" class="btn btn-secondary" onclick="window.location.href='dashboard.html'">Cancelar</button>
+    </form>
+  </main>
+
+  <script type="module" src="js/user.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
