@@ -26,7 +26,7 @@ async function carregarHistorico() {
         <td>${income.observacao || '-'}</td>
         <td>
           <button onclick="editarReceita(${income.id})" class="btn btn-sm btn-warning me-1">Editar</button>
-          <button onclick="deletarReceita(${income.id})" class="btn btn-sm btn-danger">X</button>
+          <button onclick="deletarReceita(${income.id})" class="btn btn-sm btn-danger">Excluir</button>
         </td>
       `
 

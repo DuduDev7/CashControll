@@ -100,7 +100,7 @@ function renderExpense(expense) {
     <td>${expense.observacao || '-'}</td>
     <td>
       <button onclick="editarDespesa(${expense.id})" class="btn btn-sm btn-warning me-1">Editar</button>
-      <button onclick="removerDespesa(${expense.id})" class="btn btn-sm btn-danger">X</button>
+      <button onclick="removerDespesa(${expense.id})" class="btn btn-sm btn-danger">Excluir</button>
     </td>
   `
 
